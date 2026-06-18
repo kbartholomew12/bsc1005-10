@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Genetics Case Files: The Inheritance Investigation</title>
+  <style>
+    :root{
+      --vc-red:#bf311a;
+      --vc-red-dark:#8f2414;
+      --ink:#1f2937;
+      --muted:#5f6b7a;
+      --soft:#f7f3ef;
+      --card:#ffffff;
+      --line:#e6ded7;
+      --gold:#f4c542;
+      --blue:#3b82f6;
+      --green:#22a06b;
+      --purple:#7c3aed;
+      --orange:#f97316;
+      --danger:#dc2626;
+      --shadow:0 16px 35px rgba(31,41,55,.10);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(191,49,26,.13), transparent 32rem),
+        radial-gradient(circle at top right, rgba(59,130,246,.12), transparent 28rem),
+        linear-gradient(180deg,#fff,var(--soft));
+      min-height:100vh;
+    }
+    .app-shell{max-width:1180px;margin:0 auto;padding:22px 14px 44px;}
+    .hero{
+      background:linear-gradient(180deg,#ffffff,#f8fbfd);
+      color:var(--ink);
+      border-radius:30px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+      border:1px solid var(--line);
+    }
+    .hero-grid{display:grid;grid-template-columns:1fr;gap:14px;align-items:center;position:relative;z-index:1;}
+    .hero-banner{width:100%;display:block;border-radius:24px;border:1px solid #e6edf2;box-shadow:0 12px 28px rgba(31,41,55,.08);background:#fff;}
+    .hero-copy{padding:2px 8px 4px;}
+    .eyebrow{letter-spacing:.12em;text-transform:uppercase;font-size:.76rem;font-weight:800;color:var(--vc-red-dark);margin-bottom:8px;}
+    h1{font-size:clamp(2rem,4vw,4rem);line-height:1;margin:0 0 12px;font-weight:900;}
+    .hero p{font-size:1.02rem;line-height:1.55;margin:0 auto;max-width:860px;color:var(--ink);text-align:center;}
+    .topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:18px 0 14px;flex-wrap:wrap;}
+    .progress-wrap{flex:1;min-width:240px;background:#eee2dc;border-radius:999px;height:14px;overflow:hidden;border:1px solid #decfc8;}
+    .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--vc-red),#f97316);transition:width .25s ease;border-radius:999px;}
+    .step-label{font-weight:800;color:var(--vc-red-dark);font-size:.94rem;}
+    .panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-top:14px;}
+    .panel.active{display:block;animation:fade .18s ease-in;}
+    @keyframes fade{from{opacity:.3;transform:translateY(5px)}to{opacity:1;transform:none}}
+    h2{font-size:clamp(1.45rem,2.5vw,2.1rem);margin:0 0 12px;line-height:1.1;color:#2b1613;}
+    h3{margin:20px 0 8px;color:#2b1613;font-size:1.08rem;}
+    p{line-height:1.58;color:var(--ink);}
+    .muted{color:var(--muted)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+    .info-card,.mini-card,.question-card{
+      border:1px solid var(--line);border-radius:18px;background:#fff;padding:16px;
+    }
+    .info-card{background:linear-gradient(180deg,#fff,#fff8f5)}
+    .mini-card{box-shadow:0 8px 20px rgba(31,41,55,.05)}
+    .question-card{margin:14px 0;background:#fffdfb;}
+    .badge{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:850;padding:7px 10px;border-radius:999px;background:#fee9e2;color:var(--vc-red-dark);border:1px solid #ffd0c3;}
+    .case-banner{background:linear-gradient(135deg,#fff8f5,#f4f8ff);border:1px solid var(--line);border-radius:22px;padding:18px;display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:center;margin:16px 0;}
+    .case-title{font-size:1.35rem;font-weight:900;margin:4px 0;color:#2b1613;}
+    label{font-weight:750;display:block;margin:10px 0 6px;color:#2b1613;}
+    input[type="text"], textarea, select{
+      width:100%;border:1px solid #d9cfc8;border-radius:14px;padding:12px 13px;font:inherit;background:white;color:var(--ink);outline:none;
+    }
+    textarea{min-height:92px;resize:vertical;}
+    input[type="text"]:focus, textarea:focus, select:focus{border-color:var(--vc-red);box-shadow:0 0 0 4px rgba(191,49,26,.12);}
+    .button-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px;}
+    button,.button-like{
+      border:0;border-radius:999px;padding:12px 18px;font-weight:850;font-size:.95rem;cursor:pointer;
+      background:var(--vc-red);color:white;box-shadow:0 9px 20px rgba(191,49,26,.22);transition:transform .12s ease,background .12s ease;
+      text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+    }
+    button:hover,.button-like:hover{transform:translateY(-1px);background:var(--vc-red-dark)}
+    button.secondary{background:#2f3640;box-shadow:0 9px 20px rgba(31,41,55,.12)}
+    button.ghost{background:#fff;color:var(--vc-red-dark);border:1px solid #f0c7bb;box-shadow:none;}
+    button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .feedback{display:none;margin-top:12px;border-radius:16px;padding:12px 14px;font-weight:700;line-height:1.45;}
+    .feedback.good{display:block;background:#e9f8f1;color:#145c3f;border:1px solid #bdebd4;}
+    .feedback.fix{display:block;background:#fff4e8;color:#8a4305;border:1px solid #ffd9aa;}
+    .feedback.note{display:block;background:#eef4ff;color:#1c4a86;border:1px solid #cbdfff;}
+    .term-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    .term-card{border:1px solid var(--line);border-radius:18px;padding:14px;background:#fff;min-height:108px;position:relative;overflow:hidden;}
+    .term-card strong{display:block;font-size:1.02rem;margin-bottom:4px;color:#2b1613;}
+    .allele-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0;}
+    .allele-tile{width:48px;height:48px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-weight:950;font-size:1.35rem;color:#2b1613;background:#fff;border:2px solid #e3d8d1;box-shadow:0 8px 16px rgba(31,41,55,.08);}
+    .allele-tile.dom{background:#ffefdf;border-color:#ffc08b;}
+    .allele-tile.rec{background:#edf2ff;border-color:#b7c8ff;}
+    .radio-list{display:grid;gap:9px;margin-top:8px;}
+    .radio-list label{font-weight:650;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff;margin:0;display:flex;gap:9px;align-items:flex-start;}
+    .radio-list input{margin-top:3px;}
+    .punnett{display:grid;gap:0;border:2px solid #2b1613;border-radius:16px;overflow:hidden;background:#2b1613;max-width:520px;margin:12px auto;}
+    .punnett.two{grid-template-columns:70px repeat(2,1fr);}
+    .punnett.four{grid-template-columns:66px repeat(4,1fr);font-size:.86rem;}
+    .cell{background:white;min-height:64px;border:1px solid #2b1613;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:850;padding:6px;}
+    .cell.head{background:#2b1613;color:white;font-weight:950;}
+    .cell.corner{background:#62413a;color:#fff;}
+    .cell.result{background:#fffaf7;}
+    .chromosome-stage{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0;}
+    .svg-wrap{display:flex;justify-content:center;align-items:center;min-height:170px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:8px;overflow:hidden;}
+    svg{max-width:100%;height:auto;}
+    .pedigree-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;font-size:.86rem;color:var(--muted)}
+    .match-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:10px;align-items:center;margin:8px 0;padding:10px;border:1px solid var(--line);border-radius:14px;background:#fff;}
+    .report-box{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:14px;}
+    .report-section{border-top:1px solid var(--line);padding-top:14px;margin-top:14px;}
+    .report-section:first-child{border-top:0;padding-top:0;margin-top:0;}
+    .small{font-size:.9rem;}
+    .pill-list{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+    .pill{border-radius:999px;padding:7px 10px;background:#f3f4f6;border:1px solid #e5e7eb;font-size:.86rem;font-weight:800;color:#374151;}
+    .mobile-note{display:none;}
+    .canvas-note{background:#f8fafc;border:1px dashed #a9bacb;border-radius:18px;padding:14px;margin-top:14px;color:#334155;}
+    .sr-only{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;}
+    .hidden{display:none!important;}
+    .print-only{display:none;}
+
+    .station-figure{margin:14px 0 18px;}
+    .station-figure img{width:100%;height:auto;display:block;border-radius:20px;border:1px solid var(--line);box-shadow:var(--shadow);background:#fff;}
+    .figure-caption{font-size:.92rem;color:var(--muted);margin-top:8px;line-height:1.45;}
+    .station-figure.tight{max-width:920px;margin-left:auto;margin-right:auto;}
+    .figure-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+    @media(max-width:850px){
+      .hero-grid,.grid-2,.grid-3,.case-banner,.chromosome-stage,.figure-grid-2{grid-template-columns:1fr;}
+      .term-grid{grid-template-columns:1fr;}
+      .hero{padding:22px;border-radius:24px;}
+      .panel{padding:18px;border-radius:20px;}
+      .punnett.four{font-size:.75rem;grid-template-columns:48px repeat(4,1fr);}
+      .punnett.two{grid-template-columns:52px repeat(2,1fr);}
+      .cell{min-height:52px;padding:4px;}
+      .mobile-note{display:block;}
+      .match-grid{grid-template-columns:1fr;}
+      button,.button-like{width:100%;justify-content:center;}
+    }
+    @media print{
+      body{background:white;color:#111;}
+      .hero,.topbar,.panel:not(#panel-report),#panel-report > h2,#panel-report > p,#panel-report > .button-row,.no-print{display:none!important;}
+      .app-shell{max-width:100%;padding:0;}
+      #panel-report{display:block!important;border:0;box-shadow:none;padding:0;margin:0;}
+      .report-box{border:0;padding:0;margin:0;}
+      .report-section{break-inside:avoid;}
+      .print-only{display:block;}
+      .badge,.pill{border:1px solid #aaa;background:white;color:#111;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-grid">
+        <img class="hero-banner" src="assets/genetics-case-files-header.png" alt="Genetics Case Files: The Inheritance Investigation header graphic featuring DNA, chromosomes, a pedigree chart, a Punnett square, and pea plant imagery." />
+        <div class="hero-copy">
+          <div class="eyebrow">BIO Genetics Lab</div>
+          <p>Investigate inheritance patterns using Mendel’s laws, Punnett squares, meiosis, pedigrees, non-Mendelian traits, and sex-linked inheritance.</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="topbar no-print">
+      <span class="step-label" id="stepLabel">Station 1 of 10</span>
+      <div class="progress-wrap" aria-label="Progress"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <main>
+      <section class="panel active" id="panel-intro" data-title="Launch Lab">
+        <span class="badge">Purpose • Task • Criteria</span>
+        <h2>Launch the Inheritance Investigation</h2>
+        <div class="grid-3">
+          <div class="info-card">
+            <h3>Purpose</h3>
+            <p>Use genetics as a problem-solving tool. You will practice explaining how traits move from parents to offspring and how inheritance patterns connect to meiosis.</p>
+          </div>
+          <div class="info-card">
+            <h3>Task</h3>
+            <p>Move through each station, answer the prompts, check your thinking, and build a final Genetics Investigation Report.</p>
+          </div>
+          <div class="info-card">
+            <h3>Criteria for success</h3>
+            <p>Your report should show accurate Punnett square reasoning, correct inheritance pattern interpretation, and clear explanations in your own words.</p>
+          </div>
+        </div>
+        <div class="station-figure tight">
+          <img src="assets/mendel-pea-traits.png" alt="Infographic showing Mendel's pea traits, including stem length, seed shape, seed color, flower color, pod color, pod shape, and flower position." />
+          <div class="figure-caption">Use this overview graphic as your visual anchor for the Mendel-focused parts of the activity.</div>
+        </div>
+        <div class="canvas-note">
+          <strong>Submission reminder:</strong> At the end, use the report page to print/save your work as a PDF. Upload that PDF to Canvas as directed by your instructor.
+        </div>
+        <div class="button-row">
+          <button onclick="nextPanel()">Start Investigation →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-case" data-title="Case File">
+        <span class="badge">Station 1</span>
+        <h2>Generate Your Case File</h2>
+        <p class="muted">Enter your name, then generate a case. Your assigned case will personalize several prompts in the activity.</p>
+        <label for="studentName">Student name</label>
+        <input type="text" id="studentName" placeholder="Type your full name" autocomplete="name" />
+        <div class="button-row">
+          <button onclick="generateCase()">Generate my case file</button>
+          <button class="ghost" onclick="generateCase(true)">Generate a different case</button>
+        </div>
+        <div id="caseOutput"></div>
+        <div class="feedback note" id="caseFeedback">Your case is ready. Continue to the next station.</div>
+        <div class="button-row">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button id="caseNext" onclick="nextPanel()" disabled>Continue →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-decoder" data-title="Genetics Decoder">
+        <span class="badge">Station 2</span>
+        <h2>Genetics Decoder</h2>
+        <p>Before solving crosses, decode the language of inheritance.</p>
+        <div class="station-figure tight">
+          <img src="assets/mendel-pea-traits.png" alt="Mendel pea traits infographic with genotype and phenotype example." />
+          <div class="figure-caption">This graphic can help you connect allele symbols to visible traits before you answer the decoder questions.</div>
+        </div>
+        <div class="term-grid">
+          <div class="term-card"><strong>Genotype</strong><span class="muted">The allele combination an organism has.</span><div class="allele-row"><span class="allele-tile dom">A</span><span class="allele-tile rec">a</span></div></div>
+          <div class="term-card"><strong>Phenotype</strong><span class="muted">The trait that is expressed or observed.</span><div id="phenotypeMini"></div></div>
+          <div class="term-card"><strong>Dominant vs. recessive</strong><span class="muted">A dominant allele can show with one copy. A recessive trait usually needs two copies.</span></div>
+        </div>
+        <div class="question-card">
+          <h3>Your assigned genotype</h3>
+          <div id="decoderPrompt"></div>
+          <label for="decoderType">This genotype is...</label>
+          <select id="decoderType">
+            <option value="">Choose one</option>
+            <option value="homozygous dominant">Homozygous dominant</option>
+            <option value="heterozygous">Heterozygous</option>
+            <option value="homozygous recessive">Homozygous recessive</option>
+          </select>
+          <label for="decoderPhenotype">What phenotype would be expressed?</label>
+          <select id="decoderPhenotype"></select>
+          <label for="decoderExplain">Explain your reasoning in one sentence.</label>
+          <textarea id="decoderExplain" placeholder="Use allele, dominant, recessive, genotype, or phenotype in your explanation."></textarea>
+          <div class="button-row"><button onclick="checkDecoder()">Check decoder</button></div>
+          <div id="decoderFeedback" class="feedback"></div>
+        </div>
+        <div class="button-row">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button onclick="nextPanel()">Continue →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-mono" data-title="Monohybrid Cross">
+        <span class="badge">Station 3</span>
+        <h2>Monohybrid Cross Builder</h2>
+        <p>A monohybrid cross follows one trait. Use the case details to solve and interpret the cross.</p>
+        <div class="station-figure tight">
+          <img src="assets/monohybrid-cross.png" alt="Monohybrid cross infographic showing parent generation, gametes, Punnett square, genotype ratio, and phenotype ratio." />
+          <div class="figure-caption">Use this worked example as a model while you solve the monohybrid cross for your assigned case.</div>
+        </div>
+        <div id="monoCase" class="case-banner"></div>
+        <div class="question-card">
+          <h3>Build the cross</h3>
+          <div id="monoPunnett"></div>
+          <div class="grid-2">
+            <div>
+              <label for="monoGenotypeRatio">Genotype ratio</label>
+              <select id="monoGenotypeRatio">
+                <option value="">Choose one</option>
+                <option value="1:2:1">1 homozygous dominant : 2 heterozygous : 1 homozygous recessive</option>
+                <option value="1:1">1 heterozygous : 1 homozygous recessive</option>
+                <option value="all heterozygous">All heterozygous</option>
+              </select>
+            </div>
+            <div>
+              <label for="monoPhenotypeRatio">Phenotype ratio</label>
+              <select id="monoPhenotypeRatio">
+                <option value="">Choose one</option>
+                <option value="3:1">3 dominant phenotype : 1 recessive phenotype</option>
+                <option value="1:1">1 dominant phenotype : 1 recessive phenotype</option>
+                <option value="all dominant">All dominant phenotype</option>
+              </select>
+            </div>
+          </div>
+          <label for="monoInterpret">Interpret the probability in your own words.</label>
+          <textarea id="monoInterpret" placeholder="Example: This does not guarantee exactly 3 out of 4 offspring, but it predicts the expected probability for each offspring."></textarea>
+          <div class="button-row"><button onclick="checkMono()">Check monohybrid cross</button></div>
+          <div id="monoFeedback" class="feedback"></div>
+        </div>
+        <div class="button-row">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button onclick="nextPanel()">Continue →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-di" data-title="Dihybrid Cross">
+        <span class="badge">Station 4</span>
+        <h2>Dihybrid Cross + Independent Assortment</h2>
+        <p>A dihybrid cross follows two traits at the same time. This station connects Mendel’s law of independent assortment to meiosis.</p>
+        <div class="figure-grid-2 station-figure">
+          <div>
+            <img src="assets/dihybrid-cross.png" alt="Dihybrid cross infographic showing RrYy by RrYy cross with gametes, Punnett square, and 9 to 3 to 3 to 1 phenotype ratio." />
+            <div class="figure-caption">This graphic shows the classic dihybrid seed shape and seed color example.</div>
+          </div>
+          <div>
+            <img src="assets/mendel-laws-meiosis.png" alt="Infographic connecting Mendel's laws with meiosis, homologous chromosomes, independent assortment, and gamete formation." />
+            <div class="figure-caption">This second graphic previews how meiosis explains the gametes that appear in a dihybrid cross.</div>
+          </div>
+        </div>
+        <div class="case-banner" style="grid-template-columns:1fr;">
+          <div>
+            <div class="case-title">Two-Trait Cross</div>
+            <p><strong>Parent cross:</strong> RrYy × RrYy</p>
+            <p><strong>R</strong> = round seed, <strong>r</strong> = wrinkled seed<br><strong>Y</strong> = yellow seed, <strong>y</strong> = green seed</p>
+          </div>
+        </div>
+        <div class="question-card">
+          <h3>Gamete check</h3>
+          <p>Which gametes can a parent with genotype <strong>RrYy</strong> make?</p>
+          <div class="grid-2" id="gameteChecks">
+            <label><input type="checkbox" value="RY"> RY</label>
+            <label><input type="checkbox" value="Ry"> Ry</label>
+            <label><input type="checkbox" value="rY"> rY</label>
+            <label><input type="checkbox" value="ry"> ry</label>
+            <label><input type="checkbox" value="RR"> RR</label>
+            <label><input type="checkbox" value="yy"> yy</label>
+          </div>
+          <label for="diRatio">Expected F2 phenotype ratio</label>
+          <select id="diRatio">
+            <option value="">Choose one</option>
+            <option value="9:3:3:1">9 round yellow : 3 round green : 3 wrinkled yellow : 1 wrinkled green</option>
+            <option value="3:1">3 dominant : 1 recessive</option>
+            <option value="1:1:1:1">1 : 1 : 1 : 1</option>
+            <option value="1:2:1">1 : 2 : 1</option>
+          </select>
+          <label for="diExplain">Why can RrYy make four gamete combinations?</label>
+          <textarea id="diExplain" placeholder="Connect your explanation to homologous chromosomes, meiosis I, and independent assortment."></textarea>
+          <div id="diPunnett" class="hidden"></div>
+          <div class="button-row"><button onclick="checkDi()">Check dihybrid reasoning</button></div>
+          <div id="diFeedback" class="feedback"></div>
+        </div>
+        <div class="button-row">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button onclick="nextPanel()">Continue →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-meiosis" data-title="Mendel + Meiosis">
+        <span class="badge">Station 5</span>
+        <h2>Mendel’s Laws Meet Meiosis</h2>
+        <p>Mendel did not know about chromosomes, but his laws make sense when you connect them to what happens during meiosis.</p>
+        <div class="station-figure tight">
+          <img src="assets/mendel-laws-meiosis.png" alt="Infographic showing Mendel's laws and meiosis with chromosome alignment and gamete outcomes." />
+          <div class="figure-caption">Study the chromosome diagrams as you connect segregation and independent assortment to meiosis.</div>
+        </div>
+        <div class="grid-2">
+          <div class="mini-card">
+            <h3>Law of Segregation</h3>
+            <p>Allele pairs separate so each gamete receives one allele for a gene.</p>
+          </div>
+          <div class="mini-card">
+            <h3>Law of Independent Assortment</h3>
+            <p>Alleles for different genes can separate independently when genes are on different chromosomes or far apart.</p>
+          </div>
+        </div>
+        <div class="question-card">
+          <label for="segEvent">Which meiosis event best explains the law of segregation?</label>
+          <select id="segEvent">
+            <option value="">Choose one</option>
+            <option value="homologs separate">Homologous chromosomes separate during meiosis I.</option>
+            <option value="dna replicates">DNA replicates before meiosis begins.</option>
+            <option value="cytokinesis">Cytokinesis divides the cytoplasm.</option>
+          </select>
+          <label for="assortEvent">Which meiosis event best explains independent assortment?</label>
+          <select id="assortEvent">
+            <option value="">Choose one</option>
+            <option value="random alignment">Homologous chromosome pairs can line up in different combinations during metaphase I.</option>
+            <option value="sister chromatids identical">Sister chromatids are identical after DNA replication.</option>
+            <option value="fertilization">Fertilization combines egg and sperm.</option>
+          </select>
+          <label for="meiosisExplain">Explain how meiosis creates genetic variation.</label>
+          <textarea id="meiosisExplain" placeholder="Use at least one of these terms: segregation, independent assortment, crossing-over, gametes."></textarea>
+          <div class="button-row"><button onclick="checkMeiosis()">Check meiosis connection</button></div>
+          <div id="meiosisFeedback" class="feedback"></div>
+        </div>
+        <div class="button-row">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button onclick="nextPanel()">Continue →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-pedigree" data-title="Pedigree Detective">
+        <span class="badge">Station 6</span>
+        <h2>Pedigree Detective</h2>
+        <p>Use the family pattern to decide whether the trait is autosomal dominant or autosomal recessive.</p>
+        <div class="station-figure tight">
+          <img src="assets/pedigree-patterns.png" alt="Pedigree patterns infographic comparing autosomal recessive and autosomal dominant inheritance." />
+          <div class="figure-caption">Use this reference to compare the clues in your family case before choosing the inheritance pattern.</div>
+        </div>
+        <div class="case-banner" style="grid-template-columns:1fr;">
+          <div>
+            <div class="case-title" id="pedTitle">Family Pedigree</div>
+            <p id="pedScenario"></p>
+            <div class="pedigree-legend">
+              <span>□ male</span><span>○ female</span><span>filled = affected</span><span>half-filled = carrier</span>
+            </div>
+          </div>
+        </div>
+        <div class="question-card">
+          <label for="pedPattern">Which inheritance pattern best fits this pedigree?</label>
+          <select id="pedPattern">
+            <option value="">Choose one</option>
+            <option value="autosomal recessive">Autosomal recessive</option>
+            <option value="autosomal dominant">Autosomal dominant</option>
+          </select>
+          <label for="pedEvidence">What evidence supports your choice?</label>
+          <textarea id="pedEvidence" placeholder="Describe the clue you used, such as skipping generations, affected parent, equal male/female pattern, or unaffected carrier parents."></textarea>
+          <div class="button-row"><button onclick="checkPedigree()">Check pedigree</button></div>
+          <div id="pedFeedback" class="feedback"></div>
+        </div>
+        <div class="button-row">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button onclick="nextPanel()">Continue →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-disorders" data-title="Human Disorders">
+        <span class="badge">Station 7</span>
+        <h2>Human Genetics Disorder Match</h2>
+        <p>Match each disorder to the inheritance pattern most commonly emphasized in introductory biology.</p>
+        <div class="station-figure tight">
+          <img src="assets/human-genetic-disorders.png" alt="Human genetic disorders infographic showing cystic fibrosis, sickle cell disease, Huntington disease, Marfan syndrome, Duchenne muscular dystrophy, and red-green color blindness." />
+          <div class="figure-caption">Keep this chart nearby as you match each disorder to the inheritance pattern most often associated with it.</div>
+        </div>
+        <div class="question-card" id="disorderMatch"></div>
+        <div class="button-row"><button onclick="checkDisorders()">Check disorder matches</button></div>
+        <div id="disorderFeedback" class="feedback"></div>
+        <div class="button-row">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button onclick="nextPanel()">Continue →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-beyond" data-title="Beyond Mendel">
+        <span class="badge">Station 8</span>
+        <h2>Beyond Mendel’s Laws</h2>
+        <p>Not every trait follows a simple dominant/recessive pattern. Match each mini-case to the best inheritance concept.</p>
+        <div class="figure-grid-2 station-figure">
+          <div>
+            <img src="assets/incomplete-vs-codominance.png" alt="Infographic comparing incomplete dominance and codominance using flowers and ABO blood types." />
+          </div>
+          <div>
+            <img src="assets/beyond-mendel.png" alt="Beyond Mendel infographic showing polygenic traits, multifactorial traits, epistasis, pleiotropy, and linkage." />
+          </div>
+        </div>
+        <div class="figure-caption">These graphics summarize the main non-Mendelian patterns featured in this station.</div>
+        <div class="question-card" id="beyondMatch"></div>
+        <label for="beyondExplain">Choose one beyond-Mendel concept and explain how it differs from a simple Mendelian dominant/recessive trait.</label>
+        <textarea id="beyondExplain" placeholder="Example: In codominance, both alleles are fully expressed in the heterozygote..."></textarea>
+        <div class="button-row"><button onclick="checkBeyond()">Check beyond-Mendel matches</button></div>
+        <div id="beyondFeedback" class="feedback"></div>
+        <div class="button-row">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button onclick="nextPanel()">Continue →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-sex" data-title="Sex-Linked Challenge">
+        <span class="badge">Station 9</span>
+        <h2>Sex-Linked Inheritance Challenge</h2>
+        <p>Sex-linked traits often show different patterns in males and females because males typically have one X chromosome and one Y chromosome.</p>
+        <div class="station-figure tight">
+          <img src="assets/sex-linked-inheritance.png" alt="Sex-linked inheritance infographic showing X-linked recessive color blindness example with Punnett square and key idea about males expressing X-linked recessive traits more often." />
+          <div class="figure-caption">Use this reference when you interpret the X-linked Punnett square and answer the explanation prompt.</div>
+        </div>
+        <div id="sexCase" class="case-banner"></div>
+        <div class="question-card">
+          <div id="sexPunnett"></div>
+          <div class="grid-2">
+            <div>
+              <label for="sexAffectedSons">Chance that a son is affected</label>
+              <select id="sexAffectedSons">
+                <option value="">Choose one</option>
+                <option value="0%">0%</option>
+                <option value="50%">50%</option>
+                <option value="100%">100%</option>
+              </select>
+            </div>
+            <div>
+              <label for="sexCarrierDaughters">Chance that a daughter is a carrier</label>
+              <select id="sexCarrierDaughters">
+                <option value="">Choose one</option>
+                <option value="0%">0%</option>
+                <option value="50%">50%</option>
+                <option value="100%">100%</option>
+              </select>
+            </div>
+          </div>
+          <label for="sexExplain">Why are X-linked recessive traits more often expressed in males?</label>
+          <textarea id="sexExplain" placeholder="Explain using X chromosome, Y chromosome, recessive allele, and masking."></textarea>
+          <div class="button-row"><button onclick="checkSex()">Check sex-linked reasoning</button></div>
+          <div id="sexFeedback" class="feedback"></div>
+        </div>
+        <div class="button-row">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button onclick="nextPanel(); buildReport();">Build report →</button>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-report" data-title="Final Report">
+        <div class="print-only">
+          <h1>Genetics Case Files: Inheritance Investigation Report</h1>
+        </div>
+        <span class="badge no-print">Station 10</span>
+        <h2>Final Genetics Investigation Report</h2>
+        <p class="muted no-print">Review your report. Then print/save as PDF and upload it to Canvas.</p>
+        <div class="report-box" id="reportContent"></div>
+        <div class="button-row no-print">
+          <button class="secondary" onclick="prevPanel()">← Back</button>
+          <button onclick="buildReport(); window.print();">Print / Save as PDF</button>
+          <button class="ghost" onclick="buildReport()">Refresh report</button>
+          <button class="ghost" onclick="resetLab()">Start over</button>
+        </div>
+        <div class="canvas-note no-print">
+          <strong>Canvas submission:</strong> Choose <em>Print / Save as PDF</em>. In the print window, select <em>Save as PDF</em> as the destination/printer. Upload the saved PDF to the assignment in Canvas.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const panels = [
+      'panel-intro','panel-case','panel-decoder','panel-mono','panel-di','panel-meiosis','panel-pedigree','panel-disorders','panel-beyond','panel-sex','panel-report'
+    ];
+    let currentIndex = 0;
+    const app = {
+      studentName:'',
+      case:null,
+      answers:{},
+      disorderAnswers:{},
+      beyondAnswers:{}
+    };
+
+    const cases = [
+      {
+        id:'pea-pods', title:'Pea Pod Color Case', theme:'Mendel Plant Lab',
+        trait:'pod color', symbol:'G', dom:'green pods', rec:'yellow pods',
+        genotype:'Gg', genotypeType:'heterozygous', phenotype:'green pods',
+        parents:'Gg × gg', p1:['G','g'], p2:['g','g'],
+        genotypeRatio:'1:1', phenotypeRatio:'1:1',
+        pedigree:'autosomal recessive',
+        disorder:'Cystic Fibrosis Pattern',
+        disorderPattern:'autosomal recessive'
+      },
+      {
+        id:'flower-height', title:'Plant Height Case', theme:'Greenhouse Genetics',
+        trait:'plant height', symbol:'T', dom:'tall plants', rec:'short plants',
+        genotype:'TT', genotypeType:'homozygous dominant', phenotype:'tall plants',
+        parents:'TT × tt', p1:['T','T'], p2:['t','t'],
+        genotypeRatio:'all heterozygous', phenotypeRatio:'all dominant',
+        pedigree:'autosomal dominant',
+        disorder:'Huntington Disease Pattern',
+        disorderPattern:'autosomal dominant'
+      },
+      {
+        id:'seed-shape', title:'Seed Shape Case', theme:'Seed Bank Investigation',
+        trait:'seed shape', symbol:'R', dom:'round seeds', rec:'wrinkled seeds',
+        genotype:'rr', genotypeType:'homozygous recessive', phenotype:'wrinkled seeds',
+        parents:'Rr × Rr', p1:['R','r'], p2:['R','r'],
+        genotypeRatio:'1:2:1', phenotypeRatio:'3:1',
+        pedigree:'autosomal recessive',
+        disorder:'Sickle Cell Disease Pattern',
+        disorderPattern:'autosomal recessive'
+      },
+      {
+        id:'enzyme-marker', title:'Enzyme Marker Case', theme:'Family Clinic File',
+        trait:'enzyme activity', symbol:'E', dom:'typical enzyme activity', rec:'low enzyme activity',
+        genotype:'Ee', genotypeType:'heterozygous', phenotype:'typical enzyme activity',
+        parents:'Ee × Ee', p1:['E','e'], p2:['E','e'],
+        genotypeRatio:'1:2:1', phenotypeRatio:'3:1',
+        pedigree:'autosomal dominant',
+        disorder:'Marfan Syndrome Pattern',
+        disorderPattern:'autosomal dominant'
+      }
+    ];
+
+    const disorders = [
+      {name:'Cystic fibrosis', clue:'Thick mucus affects lungs and digestion.', answer:'Autosomal recessive'},
+      {name:'Huntington disease', clue:'Progressive nervous system disorder that usually appears later in life.', answer:'Autosomal dominant'},
+      {name:'Marfan syndrome', clue:'Connective tissue disorder that can affect skeleton, eyes, heart, and blood vessels.', answer:'Autosomal dominant'},
+      {name:'Duchenne muscular dystrophy', clue:'Progressive muscle weakness; usually affects males more often.', answer:'X-linked recessive'},
+      {name:'Red-green color blindness', clue:'Difficulty distinguishing red and green hues; usually affects males more often.', answer:'X-linked recessive'}
+    ];
+
+    const beyondCases = [
+      {id:'incomplete', prompt:'Red flower × white flower produces pink offspring.', answer:'Incomplete dominance'},
+      {id:'codominance', prompt:'A person with IA and IB alleles has AB blood type.', answer:'Codominance'},
+      {id:'polygenic', prompt:'Height shows continuous variation across a population.', answer:'Polygenic inheritance'},
+      {id:'multifactorial', prompt:'Type 2 diabetes risk can be influenced by genes, diet, activity, and environment.', answer:'Multifactorial inheritance'},
+      {id:'epistasis', prompt:'One gene controls whether pigment is produced; another controls pigment color.', answer:'Epistasis'},
+      {id:'pleiotropy', prompt:'One gene affects connective tissue, influencing the skeleton, eyes, heart, and blood vessels.', answer:'Pleiotropy'},
+      {id:'linkage', prompt:'Two genes are inherited together more often because they are close on the same chromosome.', answer:'Linkage'}
+    ];
+
+    function qs(id){return document.getElementById(id)}
+    function sanitize(text){
+      return String(text || '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    }
+    function setFeedback(id,type,msg){
+      const el=qs(id); el.className='feedback '+type; el.innerHTML=msg;
+    }
+    function updateProgress(){
+      const percent = (currentIndex)/(panels.length-1)*100;
+      qs('progressFill').style.width = percent+'%';
+      const title = qs(panels[currentIndex]).dataset.title;
+      qs('stepLabel').textContent = `Station ${Math.min(currentIndex+1, panels.length)} of ${panels.length}: ${title}`;
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    function showPanel(index){
+      currentIndex = Math.max(0, Math.min(index, panels.length-1));
+      panels.forEach((id,i)=>qs(id).classList.toggle('active', i===currentIndex));
+      updateProgress();
+    }
+    function nextPanel(){showPanel(currentIndex+1)}
+    function prevPanel(){showPanel(currentIndex-1)}
+
+    function generateCase(force=false){
+      const name = qs('studentName').value.trim();
+      if(!name){
+        qs('studentName').focus();
+        qs('caseOutput').innerHTML='<div class="feedback fix">Please enter your name before generating the case file.</div>';
+        return;
+      }
+      app.studentName = name;
+      if(!app.case || force){
+        app.case = cases[Math.floor(Math.random()*cases.length)];
+      }
+      renderCase();
+      renderDecoder();
+      renderMono();
+      renderDi();
+      renderPedigree();
+      renderDisorders();
+      renderBeyond();
+      renderSexLinked();
+      qs('caseNext').disabled=false;
+      qs('caseFeedback').className='feedback note';
+    }
+
+    function renderCase(){
+      const c=app.case;
+      qs('caseOutput').innerHTML = `
+        <div class="case-banner">
+          <div>
+            <span class="badge">${sanitize(c.theme)}</span>
+            <div class="case-title">${sanitize(c.title)}</div>
+            <p><strong>Trait:</strong> ${sanitize(c.trait)}</p>
+            <p><strong>${c.symbol}</strong> = ${sanitize(c.dom)}<br><strong>${c.symbol.toLowerCase()}</strong> = ${sanitize(c.rec)}</p>
+            <div class="pill-list"><span class="pill">Monohybrid: ${sanitize(c.parents)}</span><span class="pill">Pedigree: mystery family pattern</span></div>
+          </div>
+          <div class="svg-wrap">${traitSvg(c)}</div>
+        </div>`;
+    }
+
+    function traitSvg(c){
+      const S=c.symbol, s=c.symbol.toLowerCase();
+      return `<svg viewBox="0 0 430 240" role="img" aria-label="Trait card for ${sanitize(c.trait)}">
+        <rect x="16" y="20" width="398" height="200" rx="28" fill="#fff8f5" stroke="#ead7cf" stroke-width="3"/>
+        <text x="215" y="55" text-anchor="middle" font-size="22" font-weight="900" fill="#2b1613">Trait: ${sanitize(c.trait)}</text>
+        <g transform="translate(58,86)">
+          <rect x="0" y="0" width="130" height="88" rx="20" fill="#ffeadb" stroke="#ffc08b" stroke-width="3"/>
+          <text x="65" y="36" text-anchor="middle" font-size="34" font-weight="900" fill="#5c1d13">${S}</text>
+          <text x="65" y="65" text-anchor="middle" font-size="14" font-weight="800" fill="#5c1d13">dominant</text>
+        </g>
+        <g transform="translate(242,86)">
+          <rect x="0" y="0" width="130" height="88" rx="20" fill="#edf2ff" stroke="#b7c8ff" stroke-width="3"/>
+          <text x="65" y="36" text-anchor="middle" font-size="34" font-weight="900" fill="#1c4a86">${s}</text>
+          <text x="65" y="65" text-anchor="middle" font-size="14" font-weight="800" fill="#1c4a86">recessive</text>
+        </g>
+        <path d="M206 132 h26" stroke="#2b1613" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="215" cy="132" r="8" fill="#bf311a"/>
+      </svg>`;
+    }
+
+    function renderDecoder(){
+      const c=app.case;
+      qs('phenotypeMini').innerHTML = `<div class="pill-list"><span class="pill">${sanitize(c.dom)}</span><span class="pill">${sanitize(c.rec)}</span></div>`;
+      qs('decoderPrompt').innerHTML = `<p><strong>Genotype:</strong></p><div class="allele-row">${c.genotype.split('').map(ch=>`<span class="allele-tile ${ch===ch.toUpperCase()?'dom':'rec'}">${ch}</span>`).join('')}</div>`;
+      qs('decoderPhenotype').innerHTML = `<option value="">Choose one</option><option value="${sanitize(c.dom)}">${sanitize(c.dom)}</option><option value="${sanitize(c.rec)}">${sanitize(c.rec)}</option>`;
+    }
+
+    function checkDecoder(){
+      const c=app.case;
+      const type=qs('decoderType').value;
+      const phen=qs('decoderPhenotype').value;
+      const exp=qs('decoderExplain').value.trim();
+      app.answers.decoder = {type, phen, exp};
+      const ok = type===c.genotypeType && phen===c.phenotype && exp.length>20;
+      if(ok){setFeedback('decoderFeedback','good','Nice. Your genotype category and phenotype match the allele pattern.');}
+      else{setFeedback('decoderFeedback','fix',`Check this: <strong>${sanitize(c.genotype)}</strong> is <strong>${sanitize(c.genotypeType)}</strong> and expresses <strong>${sanitize(c.phenotype)}</strong>. Add a sentence explaining why.`);}
+    }
+
+    function combineAlleles(a,b){
+      return (a+b).split('').sort((x,y)=>{
+        const lx=x.toLowerCase(), ly=y.toLowerCase();
+        if(lx===ly){return x===x.toUpperCase()?-1:1}
+        return lx.localeCompare(ly);
+      }).join('');
+    }
+    function renderPunnett2(p1,p2){
+      let html='<div class="punnett two"><div class="cell corner">×</div>';
+      p2.forEach(g=>html+=`<div class="cell head">${g}</div>`);
+      p1.forEach(g1=>{
+        html+=`<div class="cell head">${g1}</div>`;
+        p2.forEach(g2=>html+=`<div class="cell result">${combineAlleles(g1,g2)}</div>`);
+      });
+      html+='</div>';
+      return html;
+    }
+    function renderMono(){
+      const c=app.case;
+      qs('monoCase').innerHTML=`<div><div class="case-title">${sanitize(c.parents)}</div><p><strong>${c.symbol}</strong> = ${sanitize(c.dom)}<br><strong>${c.symbol.toLowerCase()}</strong> = ${sanitize(c.rec)}</p><p>Use the parent genotypes to predict possible offspring.</p></div><div class="svg-wrap">${traitSvg(c)}</div>`;
+      qs('monoPunnett').innerHTML=renderPunnett2(c.p1,c.p2);
+    }
+    function checkMono(){
+      const c=app.case;
+      const gr=qs('monoGenotypeRatio').value;
+      const pr=qs('monoPhenotypeRatio').value;
+      const interp=qs('monoInterpret').value.trim();
+      app.answers.mono={gr,pr,interp};
+      const ok = gr===c.genotypeRatio && pr===c.phenotypeRatio && interp.length>25;
+      if(ok){setFeedback('monoFeedback','good','Strong work. Your ratios fit this monohybrid cross, and your interpretation adds meaning beyond the Punnett square.');}
+      else{setFeedback('monoFeedback','fix',`Recheck the expected ratios. This cross should show genotype ratio <strong>${sanitize(c.genotypeRatio)}</strong> and phenotype ratio <strong>${sanitize(c.phenotypeRatio)}</strong>. Make sure your interpretation explains probability.`);}
+    }
+
+    function renderDi(){
+      qs('diPunnett').innerHTML = renderPunnett4();
+    }
+    function renderPunnett4(){
+      const gam=['RY','Ry','rY','ry'];
+      function combine(g1,g2){
+        const r = combineAlleles(g1[0],g2[0]);
+        const y = combineAlleles(g1[1],g2[1]);
+        return r+y;
+      }
+      let html='<h3>Completed 4×4 Punnett square</h3><div class="punnett four"><div class="cell corner">×</div>';
+      gam.forEach(g=>html+=`<div class="cell head">${g}</div>`);
+      gam.forEach(g1=>{
+        html+=`<div class="cell head">${g1}</div>`;
+        gam.forEach(g2=>html+=`<div class="cell result">${combine(g1,g2)}</div>`);
+      });
+      html+='</div>';
+      return html;
+    }
+    function checkDi(){
+      const selected = Array.from(document.querySelectorAll('#gameteChecks input:checked')).map(i=>i.value).sort();
+      const correct = ['RY','Ry','rY','ry'];
+      const ratio = qs('diRatio').value;
+      const exp=qs('diExplain').value.trim();
+      app.answers.di={selected,ratio,exp};
+      const gamOk = correct.every(v=>selected.includes(v)) && selected.length===4;
+      const expOk = /(meiosis|metaphase|homolog|independent|assort|gamete|chromosome)/i.test(exp) && exp.length>35;
+      qs('diPunnett').classList.remove('hidden');
+      if(gamOk && ratio==='9:3:3:1' && expOk){setFeedback('diFeedback','good','Yep. RrYy can produce RY, Ry, rY, and ry because homologous chromosome pairs assort independently during meiosis I.');}
+      else{setFeedback('diFeedback','fix','Review the gametes and ratio: RrYy can make <strong>RY, Ry, rY, and ry</strong>. A heterozygous dihybrid cross usually gives a <strong>9:3:3:1</strong> phenotype ratio when the genes assort independently.');}
+    }
+
+    function checkMeiosis(){
+      const seg=qs('segEvent').value, assort=qs('assortEvent').value, exp=qs('meiosisExplain').value.trim();
+      app.answers.meiosis={seg,assort,exp};
+      const expOk=/(segregation|independent|assort|crossing|gamete|variation|homolog|chromosome)/i.test(exp) && exp.length>35;
+      if(seg==='homologs separate' && assort==='random alignment' && expOk){setFeedback('meiosisFeedback','good','Great connection. Segregation and independent assortment are chromosome behaviors during meiosis.');}
+      else{setFeedback('meiosisFeedback','fix','Try again: segregation connects to homologous chromosomes separating, and independent assortment connects to random alignment of homologous pairs during metaphase I. Add a clear variation explanation.');}
+    }
+
+    function renderPedigree(){
+      const pattern = app.case ? app.case.pedigree : 'autosomal recessive';
+      qs('pedTitle').textContent = pattern==='autosomal recessive' ? 'Case A: Trait skips a generation' : 'Case B: Trait appears every generation';
+      qs('pedScenario').innerHTML = pattern==='autosomal recessive'
+        ? 'Two unaffected parents have an affected child. Males and females can both be affected. Some family members may be carriers without showing the trait.'
+        : 'Affected individuals appear in each generation. An affected child usually has an affected parent. Males and females can both be affected.';
+    }
+    function pedigreeRecessiveSvg(){
+      return `<svg viewBox="0 0 460 260" role="img" aria-label="Autosomal recessive pedigree">
+        <rect x="10" y="10" width="440" height="240" rx="26" fill="#fff" stroke="#ead7cf" stroke-width="3"/>
+        <line x1="155" y1="70" x2="305" y2="70" stroke="#2b1613" stroke-width="4"/>
+        <line x1="230" y1="70" x2="230" y2="130" stroke="#2b1613" stroke-width="4"/>
+        <line x1="105" y1="130" x2="355" y2="130" stroke="#2b1613" stroke-width="4"/>
+        <line x1="105" y1="130" x2="105" y2="160" stroke="#2b1613" stroke-width="4"/><line x1="230" y1="130" x2="230" y2="160" stroke="#2b1613" stroke-width="4"/><line x1="355" y1="130" x2="355" y2="160" stroke="#2b1613" stroke-width="4"/>
+        <rect x="130" y="45" width="50" height="50" fill="#fff" stroke="#2b1613" stroke-width="4"/><path d="M130 95 L180 45 L180 95 Z" fill="#f4c542" opacity=".8"/>
+        <circle cx="305" cy="70" r="26" fill="#fff" stroke="#2b1613" stroke-width="4"/><path d="M305 44 A26 26 0 0 1 305 96 Z" fill="#f4c542" opacity=".8"/>
+        <circle cx="105" cy="185" r="25" fill="#fff" stroke="#2b1613" stroke-width="4"/>
+        <rect x="205" y="160" width="50" height="50" fill="#2b1613" stroke="#2b1613" stroke-width="4"/>
+        <circle cx="355" cy="185" r="25" fill="#fff" stroke="#2b1613" stroke-width="4"/><path d="M355 160 A25 25 0 0 1 355 210 Z" fill="#f4c542" opacity=".8"/>
+        <text x="230" y="236" text-anchor="middle" font-size="15" font-weight="800" fill="#5f6b7a">Unaffected parents can have an affected child</text>
+      </svg>`;
+    }
+    function pedigreeDominantSvg(){
+      return `<svg viewBox="0 0 460 260" role="img" aria-label="Autosomal dominant pedigree">
+        <rect x="10" y="10" width="440" height="240" rx="26" fill="#fff" stroke="#ead7cf" stroke-width="3"/>
+        <line x1="155" y1="70" x2="305" y2="70" stroke="#2b1613" stroke-width="4"/>
+        <line x1="230" y1="70" x2="230" y2="130" stroke="#2b1613" stroke-width="4"/>
+        <line x1="105" y1="130" x2="355" y2="130" stroke="#2b1613" stroke-width="4"/>
+        <line x1="105" y1="130" x2="105" y2="160" stroke="#2b1613" stroke-width="4"/><line x1="230" y1="130" x2="230" y2="160" stroke="#2b1613" stroke-width="4"/><line x1="355" y1="130" x2="355" y2="160" stroke="#2b1613" stroke-width="4"/>
+        <rect x="130" y="45" width="50" height="50" fill="#2b1613" stroke="#2b1613" stroke-width="4"/>
+        <circle cx="305" cy="70" r="26" fill="#fff" stroke="#2b1613" stroke-width="4"/>
+        <circle cx="105" cy="185" r="25" fill="#2b1613" stroke="#2b1613" stroke-width="4"/>
+        <rect x="205" y="160" width="50" height="50" fill="#fff" stroke="#2b1613" stroke-width="4"/>
+        <circle cx="355" cy="185" r="25" fill="#2b1613" stroke="#2b1613" stroke-width="4"/>
+        <text x="230" y="236" text-anchor="middle" font-size="15" font-weight="800" fill="#5f6b7a">Affected individuals appear in each generation</text>
+      </svg>`;
+    }
+    function checkPedigree(){
+      const pattern=qs('pedPattern').value, evidence=qs('pedEvidence').value.trim();
+      app.answers.pedigree={pattern,evidence};
+      const expected=app.case.pedigree;
+      const evidenceOk=evidence.length>25;
+      if(pattern===expected && evidenceOk){setFeedback('pedFeedback','good','Correct. Your evidence matches the pedigree pattern.');}
+      else{setFeedback('pedFeedback','fix',`Look for the pattern clue. This case is best explained as <strong>${sanitize(expected)}</strong>. Add evidence from the pedigree.`);}
+    }
+
+    function renderDisorders(){
+      const options=['','Autosomal recessive','Autosomal dominant','X-linked recessive','Multifactorial'];
+      let html='';
+      disorders.forEach((d,i)=>{
+        html+=`<div class="match-grid"><div><strong>${sanitize(d.name)}</strong><br><span class="muted small">${sanitize(d.clue)}</span></div><select id="disorder_${i}" aria-label="Inheritance pattern for ${sanitize(d.name)}">${options.map(o=>`<option value="${o}">${o||'Choose pattern'}</option>`).join('')}</select></div>`;
+      });
+      qs('disorderMatch').innerHTML=html;
+    }
+    function checkDisorders(){
+      let correct=0; app.disorderAnswers={};
+      disorders.forEach((d,i)=>{const val=qs(`disorder_${i}`).value; app.disorderAnswers[d.name]=val; if(val===d.answer) correct++;});
+      if(correct===disorders.length){setFeedback('disorderFeedback','good','All matches are correct. Nicely done.');}
+      else{setFeedback('disorderFeedback','fix',`You matched ${correct} of ${disorders.length}. Recheck any disorder that is commonly autosomal dominant, autosomal recessive, or X-linked recessive.`);}
+    }
+
+    function renderBeyond(){
+      const options=['','Incomplete dominance','Codominance','Polygenic inheritance','Multifactorial inheritance','Epistasis','Pleiotropy','Linkage'];
+      let html='';
+      beyondCases.forEach((b,i)=>{
+        html+=`<div class="match-grid"><div><strong>Mini-case ${i+1}</strong><br><span class="muted small">${sanitize(b.prompt)}</span></div><select id="beyond_${i}" aria-label="Concept for mini-case ${i+1}">${options.map(o=>`<option value="${o}">${o||'Choose concept'}</option>`).join('')}</select></div>`;
+      });
+      qs('beyondMatch').innerHTML=html;
+    }
+    function checkBeyond(){
+      let correct=0; app.beyondAnswers={};
+      beyondCases.forEach((b,i)=>{const val=qs(`beyond_${i}`).value; app.beyondAnswers[`Mini-case ${i+1}`]=val; if(val===b.answer) correct++;});
+      const exp=qs('beyondExplain').value.trim();
+      app.answers.beyondExplain=exp;
+      if(correct===beyondCases.length && exp.length>35){setFeedback('beyondFeedback','good','Excellent. You recognized the major ways inheritance can move beyond simple dominance.');}
+      else{setFeedback('beyondFeedback','fix',`You matched ${correct} of ${beyondCases.length}. Review the mini-cases and add a clear explanation of one concept.`);}
+    }
+
+    function renderSexLinked(){
+      qs('sexCase').innerHTML = `<div>
+          <div class="case-title">X-Linked Recessive Vision Trait</div>
+          <p>A carrier female with typical vision has children with a male with typical vision.</p>
+          <p><strong>Xᴺ</strong> = typical vision &nbsp; <strong>Xⁿ</strong> = color vision trait<br><strong>Parent cross:</strong> XᴺXⁿ × XᴺY</p>
+        </div>
+        <div class="station-figure" style="margin:0;">
+          <img src="assets/x-linked-recessive-alleles.png" alt="X-linked recessive alleles graphic showing a carrier female with XN and Xn chromosomes crossed with a normal male with XN and Y chromosomes." />
+        </div>`;
+      qs('sexPunnett').innerHTML = renderSexPunnett();
+    }
+    function renderSexPunnett(){
+      const rows=['Xᴺ','Y'], cols=['Xᴺ','Xⁿ'];
+      const results=[['XᴺXᴺ','XᴺXⁿ carrier'],['XᴺY','XⁿY affected']];
+      let html='<div class="punnett two"><div class="cell corner">×</div>';
+      cols.forEach(c=>html+=`<div class="cell head">${c}</div>`);
+      rows.forEach((r,i)=>{html+=`<div class="cell head">${r}</div>`;cols.forEach((c,j)=>html+=`<div class="cell result">${results[i][j]}</div>`);});
+      html+='</div>';
+      return html;
+    }
+    function checkSex(){
+      const sons=qs('sexAffectedSons').value, daughters=qs('sexCarrierDaughters').value, exp=qs('sexExplain').value.trim();
+      app.answers.sex={sons,daughters,exp};
+      const expOk=/(x|y|male|female|recessive|mask|chromosome|allele)/i.test(exp) && exp.length>35;
+      if(sons==='50%' && daughters==='50%' && expOk){setFeedback('sexFeedback','good','Correct. Half of sons are expected to be affected, and half of daughters are expected to be carriers in this cross.');}
+      else{setFeedback('sexFeedback','fix','Recheck the Punnett square: sons inherit either Xᴺ or Xⁿ from the mother and Y from the father. In this cross, 50% of sons are affected and 50% of daughters are carriers.');}
+    }
+
+    function val(id){return sanitize(qs(id)?.value || '')}
+    function buildReport(){
+      const c=app.case || cases[0];
+      app.studentName = qs('studentName').value.trim() || app.studentName || 'Not entered';
+      const disorderRows = disorders.map((d,i)=>`<li><strong>${sanitize(d.name)}:</strong> ${sanitize(qs(`disorder_${i}`)?.value || 'Not answered')} <span class="muted">(expected: ${sanitize(d.answer)})</span></li>`).join('');
+      const beyondRows = beyondCases.map((b,i)=>`<li><strong>${sanitize(b.prompt)}</strong><br>Student answer: ${sanitize(qs(`beyond_${i}`)?.value || 'Not answered')} <span class="muted">(expected: ${sanitize(b.answer)})</span></li>`).join('');
+      const report = `
+        <div class="report-section">
+          <h3>Student + Case File</h3>
+          <p><strong>Student:</strong> ${sanitize(app.studentName)}</p>
+          <p><strong>Assigned case:</strong> ${sanitize(c.title)} — ${sanitize(c.theme)}</p>
+          <p><strong>Trait:</strong> ${sanitize(c.trait)} | <strong>${c.symbol}</strong> = ${sanitize(c.dom)} | <strong>${c.symbol.toLowerCase()}</strong> = ${sanitize(c.rec)}</p>
+        </div>
+        <div class="report-section">
+          <h3>Station 2: Genetics Decoder</h3>
+          <p><strong>Assigned genotype:</strong> ${sanitize(c.genotype)}</p>
+          <p><strong>Student genotype category:</strong> ${val('decoderType')}</p>
+          <p><strong>Student phenotype:</strong> ${val('decoderPhenotype')}</p>
+          <p><strong>Explanation:</strong> ${val('decoderExplain')}</p>
+        </div>
+        <div class="report-section">
+          <h3>Station 3: Monohybrid Cross</h3>
+          <p><strong>Parent cross:</strong> ${sanitize(c.parents)}</p>
+          <p><strong>Student genotype ratio:</strong> ${val('monoGenotypeRatio')}</p>
+          <p><strong>Student phenotype ratio:</strong> ${val('monoPhenotypeRatio')}</p>
+          <p><strong>Interpretation:</strong> ${val('monoInterpret')}</p>
+        </div>
+        <div class="report-section">
+          <h3>Station 4: Dihybrid Cross</h3>
+          <p><strong>Gametes selected:</strong> ${Array.from(document.querySelectorAll('#gameteChecks input:checked')).map(i=>sanitize(i.value)).join(', ') || 'Not answered'}</p>
+          <p><strong>Student phenotype ratio:</strong> ${val('diRatio')}</p>
+          <p><strong>Meiosis explanation:</strong> ${val('diExplain')}</p>
+        </div>
+        <div class="report-section">
+          <h3>Station 5: Mendel’s Laws + Meiosis</h3>
+          <p><strong>Segregation event:</strong> ${val('segEvent')}</p>
+          <p><strong>Independent assortment event:</strong> ${val('assortEvent')}</p>
+          <p><strong>Genetic variation explanation:</strong> ${val('meiosisExplain')}</p>
+        </div>
+        <div class="report-section">
+          <h3>Station 6: Pedigree Detective</h3>
+          <p><strong>Student pattern:</strong> ${val('pedPattern')}</p>
+          <p><strong>Evidence:</strong> ${val('pedEvidence')}</p>
+        </div>
+        <div class="report-section">
+          <h3>Station 7: Human Genetics Disorder Match</h3>
+          <ul>${disorderRows}</ul>
+        </div>
+        <div class="report-section">
+          <h3>Station 8: Beyond Mendel’s Laws</h3>
+          <ul>${beyondRows}</ul>
+          <p><strong>Student explanation:</strong> ${val('beyondExplain')}</p>
+        </div>
+        <div class="report-section">
+          <h3>Station 9: Sex-Linked Inheritance</h3>
+          <p><strong>Chance a son is affected:</strong> ${val('sexAffectedSons')}</p>
+          <p><strong>Chance a daughter is a carrier:</strong> ${val('sexCarrierDaughters')}</p>
+          <p><strong>Explanation:</strong> ${val('sexExplain')}</p>
+        </div>`;
+      qs('reportContent').innerHTML=report;
+    }
+    function resetLab(){
+      if(!confirm('Start over and clear the current answers?')) return;
+      document.querySelectorAll('input[type="text"], textarea').forEach(el=>el.value='');
+      document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
+      document.querySelectorAll('input[type="checkbox"]').forEach(el=>el.checked=false);
+      document.querySelectorAll('.feedback').forEach(el=>{el.className='feedback';el.innerHTML='';});
+      qs('caseNext').disabled=true; qs('caseOutput').innerHTML='';
+      app.case=null; app.answers={}; app.disorderAnswers={}; app.beyondAnswers={};
+      showPanel(0);
+    }
+    updateProgress();
+  </script>
+</body>
+</html>
